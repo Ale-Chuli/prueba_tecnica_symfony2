@@ -55,7 +55,7 @@ class UserController extends AbstractController
         if($user){
             $password = $data['password'];
             if($passwordHasher->isPasswordValid($user,$password)){
-                return $this -> json("User has been founded", Response::HTTP_CREATED);
+                return $this -> json("Login In ...", Response::HTTP_CREATED);
             }else{
                 return $this -> json("Invalid Password", Response::HTTP_CREATED);
             }
