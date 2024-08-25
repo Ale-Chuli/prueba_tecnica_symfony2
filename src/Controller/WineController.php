@@ -69,9 +69,9 @@ class WineController extends AbstractController
             return $this->json("New medition has been created");
         
         }else if($sensorsrep->findBy(["id"=> $data["sensor_id"]]) && !$winesrep->findBy(["id"=> $data["wine_id"]])){
-            return $this->json("Can't create the new medition, error on inputed ID_wine");
+            return $this->json("Can't create the new medition, error on inputed wine_id");
         }else if(!$sensorsrep->findBy(["id"=> $data["sensor_id"]]) && $winesrep->findBy(["id"=> $data["wine_id"]])){
-            return $this->json("Can't create the new medition, error on inputed ID_sensor");
+            return $this->json("Can't create the new medition, error on inputed sensor_id");
         }else{
             return $this->json("Can't create the new medition, error on inputed IDs");
         }
