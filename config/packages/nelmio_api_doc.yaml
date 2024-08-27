@@ -19,6 +19,21 @@ nelmio_api_doc:
                     properties:
                         email: {type: string, example: 'example123@gmail.com'}
                         password: {type: string, example: 'Password123'}
+                newSensor:
+                    type: object
+                    properties:
+                        name: {type: string, example: 'Example Name'}
+                newMedition:
+                    type: object
+                    properties:
+                        sensor_id: {type: integer, example: 1}
+                        wine_id: {type: integer, example: 1}
+                        year: {type: integer, example: 2000}
+                        color: {type: string, example: "Red"}
+                        temperature: {type: integer, example: 20}
+                        graduation: {type: integer, example: 17}
+                        ph: {type: integer, example: 6}
+
 
 
     areas: # to filter documented areas

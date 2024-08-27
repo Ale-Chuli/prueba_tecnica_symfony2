@@ -11,12 +11,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Sensors;
 use App\Repository\SensorsRepository;
+use Nelmio\ApiDocBundle\Annotation as Nelmio;
+use OpenApi\Attributes as OA;
 
 #[Route('/sensor', name: 'sensors')]
+#[Nelmio\Areas(['internal'])]
+#[OA\Tag('Sensors')]
 class SensorController extends AbstractController
 {
-    #[Route('/new', name: 'make_sensor', methods: ['POST'])]
-    public function SensorRegister(Request $request, EntityManagerInterface $em): Response
+    #[Route('/new', name: 'new_sensor', methods: ['POST'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref:'#/components/schemas/newSensor'))]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Sensor Created')]
+
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
@@ -33,7 +42,11 @@ class SensorController extends AbstractController
     }
 
     #[Route('/get', name: 'sensors_get',methods: ['GET'])]
-    public function SensorInfo(SensorsRepository $sensorsrep):Response
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'All Sensors Ordered By Name')]
+
+    public function getOrderedByName(SensorsRepository $sensorsrep):Response
     {
         $sensors = $sensorsrep->findAllOrderedByName();
         

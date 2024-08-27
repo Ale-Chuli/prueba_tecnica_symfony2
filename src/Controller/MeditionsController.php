@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Controller;
-//CALLAO
+//Por defecto
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-//Nuevos
+//Añadidos
 use App\Repository\MeditionsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\SensorsRepository;
@@ -13,14 +13,21 @@ use App\Repository\WinesRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Meditions;
+use Nelmio\ApiDocBundle\Annotation as Nelmio;
+use OpenApi\Attributes as OA;
 
 
 
 #[Route('/medition', name: 'medition')]
-class WineController extends AbstractController
+#[Nelmio\Areas(['internal'])]
+#[OA\Tag('Meditions')]
+class MeditionsController extends AbstractController
 {
-    #[Route('/get', name: 'get_wine',methods: ['GET'])]
-    public function GetWinesInfo(MeditionsRepository $meditionsrep): Response
+    #[Route('/get', name: 'get_wine_medition',methods: ['GET'])]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'All wines and it meditions')]
+    public function GetWinesMeditions(MeditionsRepository $meditionsrep): Response
     {
         $meditions = $meditionsrep->findAllWithWineName();
 
@@ -39,12 +46,16 @@ class WineController extends AbstractController
             'Ph' => $medition->getPh() 
         ];
     }
-        return $this->json(['wines' => $winesOrdered]);
+        return $this->json(['wines' => $winesOrdered], Response::HTTP_OK);
     }
 
-    #[Route('/new', name: 'new', methods: ['POST'])]
+    #[Route('/new', name: 'new_medition', methods: ['POST'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref:'#/components/schemas/newMedition'))]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Medition Created')]
     public function NewMedition(Request $request, SensorsRepository $sensorsrep,
-    WinesRepository $winesrep, EntityManagerInterface $em): JsonResponse
+    WinesRepository $winesrep, EntityManagerInterface $em): Response
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
@@ -66,14 +77,14 @@ class WineController extends AbstractController
             $em-> persist($medition);
             $em->flush();
 
-            return $this->json("New medition has been created");
+            return $this->json(["New medition has been created"], Response::HTTP_CREATED);
         
         }else if($sensorsrep->findBy(["id"=> $data["sensor_id"]]) && !$winesrep->findBy(["id"=> $data["wine_id"]])){
-            return $this->json("Can't create the new medition, error on inputed wine_id");
+            return $this->json(["Can't create the new medition, error on inputed wine_id"], Response::HTTP_UNAUTHORIZED);
         }else if(!$sensorsrep->findBy(["id"=> $data["sensor_id"]]) && $winesrep->findBy(["id"=> $data["wine_id"]])){
-            return $this->json("Can't create the new medition, error on inputed sensor_id");
+            return $this->json(["Can't create the new medition, error on inputed sensor_id"], Response::HTTP_UNAUTHORIZED);
         }else{
-            return $this->json("Can't create the new medition, error on inputed IDs");
+            return $this->json(["Can't create the new medition, error on inputed IDs"],Response::HTTP_UNAUTHORIZED);
         }
     }
 }
