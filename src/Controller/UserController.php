@@ -26,12 +26,15 @@ class UserController extends AbstractController
         description: 'User Created')]
 
     public function userRegister(EntityManagerInterface $em, Request $request,
-    UserPasswordHasherInterface $passwordHasher): Response
+    UserPasswordHasherInterface $passwordHasher, UsersRepository $userrep): Response
    {
        $body = $request-> getContent();
        $data = json_decode($body, true);
 
-       //FALTA COMPROBAR QUE EL MAIL NO SE USE--------------------------------------------------------------------------------------------------------------------------------------------------
+        if($userrep->findOneBy(["email"=> $data["email"]])){
+            return $this->json("This email is already in use, try again", 
+            Response::HTTP_UNAUTHORIZED);
+        }
 
        $user = new Users();
        $user->setEmail($data['email']);
