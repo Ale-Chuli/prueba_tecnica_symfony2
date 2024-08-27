@@ -1,0 +1,29 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: API Docs
+            description: Alejandro Chulilla
+            version: 1.0.0
+
+        components:
+            schemas:
+                userRegister:
+                    type: object
+                    properties:
+                        name: {type: string, example: 'Example Name'}
+                        Surname: {type: string, example: 'Example Surname'}
+                        email: {type: string, example: 'example123@gmail.com'}
+                        password: {type: string, example: 'Password123'}
+                userLogin:
+                    type: object
+                    properties:
+                        email: {type: string, example: 'example123@gmail.com'}
+                        password: {type: string, example: 'Password123'}
+
+
+    areas: # to filter documented areas
+        default:
+            path_patterns:
+                - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+        internal:
+            with_annotation: true
