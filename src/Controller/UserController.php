@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Controller;
-//Por defecto
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-//Añadidos
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +16,7 @@ use OpenApi\Attributes as OA;
 #[Route('/user', name: 'user')]
 #[Nelmio\Areas(['internal'])]
 #[OA\Tag('Users')]
+
 class UserController extends AbstractController
 {
     #[Route('/register', name: 'register', methods: ['POST'])]

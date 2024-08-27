@@ -1,16 +1,14 @@
 <?php
 
 namespace App\Controller;
-//Por defecto
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-//Añadidos
 use App\Repository\MeditionsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\SensorsRepository;
 use App\Repository\WinesRepository;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Meditions;
 use Nelmio\ApiDocBundle\Annotation as Nelmio;
@@ -21,12 +19,14 @@ use OpenApi\Attributes as OA;
 #[Route('/medition', name: 'medition')]
 #[Nelmio\Areas(['internal'])]
 #[OA\Tag('Meditions')]
+
 class MeditionsController extends AbstractController
 {
     #[Route('/get', name: 'get_wine_medition',methods: ['GET'])]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'All wines and it meditions')]
+
     public function GetWinesMeditions(MeditionsRepository $meditionsrep): Response
     {
         $meditions = $meditionsrep->findAllWithWineName();
@@ -54,6 +54,7 @@ class MeditionsController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_CREATED,
         description: 'Medition Created')]
+
     public function NewMedition(Request $request, SensorsRepository $sensorsrep,
     WinesRepository $winesrep, EntityManagerInterface $em): Response
     {

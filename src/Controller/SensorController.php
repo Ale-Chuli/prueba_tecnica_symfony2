@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Controller;
-//Por defecto
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-//Añadidos
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Sensors;
@@ -17,6 +15,7 @@ use OpenApi\Attributes as OA;
 #[Route('/sensor', name: 'sensors')]
 #[Nelmio\Areas(['internal'])]
 #[OA\Tag('Sensors')]
+
 class SensorController extends AbstractController
 {
     #[Route('/new', name: 'new_sensor', methods: ['POST'])]
