@@ -56,16 +56,28 @@ class MeditionsController extends AbstractController
         description: 'Medition Created')]
 
     public function NewMedition(Request $request, SensorsRepository $sensorsrep,
-    WinesRepository $winesrep, EntityManagerInterface $em): Response
+    WinesRepository $winesrep, EntityManagerInterface $em, MeditionsRepository $meditionsrep): Response
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
 
-        if($sensorsrep->findBy(["id"=> $data["sensor_id"]]) && $winesrep->findBy(["id"=> $data["wine_id"]])){
-            $medition = new Meditions();
+        $sensor = $sensorsrep->findOneBy(["id"=> $data["sensor_id"]]);
+        $wine = $winesrep->findOneBy(["id"=> $data["wine_id"]]);
+        $existingMedition = $meditionsrep->findOneBy([
+            'sensor' => $sensor,
+            'wine' => $wine,
+            'year' => $data["year"]]);
+            
 
-            $sensor = $sensorsrep->findOneBy(["id"=> $data["sensor_id"]]);
-            $wine = $winesrep->findOneBy(["id"=> $data["wine_id"]]);
+        if($sensor && $wine){
+
+            if($existingMedition){
+                return $this->json(
+                    ["This medition already exists."],
+                    Response::HTTP_CONFLICT);
+            }
+
+            $medition = new Meditions();
 
             $medition->setYear($data["year"]);
             $medition->setSensor($sensor);
@@ -75,17 +87,25 @@ class MeditionsController extends AbstractController
             $medition->setGraduation($data["graduation"]);
             $medition->setPh($data["ph"]);
 
+            // if($meditionsrep->)
+
             $em-> persist($medition);
             $em->flush();
 
-            return $this->json(["New medition has been created"], Response::HTTP_CREATED);
+            return $this->json(["New medition has been created."],
+            Response::HTTP_CREATED);
         
-        }else if($sensorsrep->findBy(["id"=> $data["sensor_id"]]) && !$winesrep->findBy(["id"=> $data["wine_id"]])){
-            return $this->json(["Can't create the new medition, error on inputed wine_id"], Response::HTTP_UNAUTHORIZED);
-        }else if(!$sensorsrep->findBy(["id"=> $data["sensor_id"]]) && $winesrep->findBy(["id"=> $data["wine_id"]])){
-            return $this->json(["Can't create the new medition, error on inputed sensor_id"], Response::HTTP_UNAUTHORIZED);
+        }else if($sensor && !$wine){
+            return $this->json(["Can't create the new medition, error on inputed wine_id."],
+            Response::HTTP_BAD_REQUEST);
+
+        }else if(!$sensor && $wine){
+            return $this->json(["Can't create the new medition, error on inputed sensor_id."],
+            Response::HTTP_BAD_REQUEST);
+
         }else{
-            return $this->json(["Can't create the new medition, error on inputed IDs"],Response::HTTP_UNAUTHORIZED);
+            return $this->json(["Can't create the new medition, error on inputed IDs."],
+            Response::HTTP_BAD_REQUEST);
         }
     }
 }

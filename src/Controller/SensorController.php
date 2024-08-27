@@ -24,15 +24,23 @@ class SensorController extends AbstractController
         response: Response::HTTP_CREATED,
         description: 'Sensor Created')]
 
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em,SensorsRepository $sensorsrep): Response
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
 
+        $sensorName = $data['name'];
+
+        if($sensorsrep-> findOneBy(['name'=> $sensorName])){
+            return $this->json(
+                ["This sensor already exists."],
+                Response::HTTP_CONFLICT);
+        }
+
         $sensor = new Sensors();
 
-        $sensor->setName($data['name']);
-        //COMPROBAR QUE EL SENSOR YA ESTA CREADO------------------------------------------------------------------------------------------------------------------------
+        $sensor->setName($sensorName);
+
         $em-> persist($sensor);
         $em->flush();
     

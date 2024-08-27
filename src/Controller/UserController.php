@@ -33,7 +33,7 @@ class UserController extends AbstractController
 
         if($userrep->findOneBy(["email"=> $data["email"]])){
             return $this->json("This email is already in use, try again", 
-            Response::HTTP_UNAUTHORIZED);
+            Response::HTTP_CONFLICT);
         }
 
        $user = new Users();
@@ -77,11 +77,11 @@ class UserController extends AbstractController
                 Response::HTTP_OK);
             }else{
                 return $this -> json("Invalid Password", 
-                Response::HTTP_UNAUTHORIZED);
+                Response::HTTP_BAD_REQUEST);
             }
             
         }
         return $this -> json("User doesn't exists", 
-        Response::HTTP_UNAUTHORIZED);
+        Response::HTTP_BAD_REQUEST);
     }
 }
