@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Nelmio\ApiDocBundle\Annotation as Nelmio;
 use OpenApi\Attributes as OA;
 
@@ -31,13 +32,13 @@ class UserController extends AbstractController
        $body = $request-> getContent();
        $data = json_decode($body, true);
 
-        if($userrep->findOneBy(["email"=> $data["email"]])){
+        if($userrep->findOneBy(["email"=> $data["username"]])){
             return $this->json("This email is already in use, try again", 
             Response::HTTP_CONFLICT);
         }
 
        $user = new Users();
-       $user->setEmail($data['email']);
+       $user->setEmail($data['username']);
        $user->setName($data['name']);
        $user->setSurname($data['surname']);
        $password = $data['password'];
@@ -63,17 +64,21 @@ class UserController extends AbstractController
     description: 'Login Successful')]
 
    public function userLogin(UsersRepository $userrep, Request $request,
-    UserPasswordHasherInterface $passwordHasher):Response
+    UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $jwtManager):Response
     {
         $body = $request-> getContent();
         $data = json_decode($body, true);
 
-        $user = $userrep->findOneBy(["email"=> $data["email"]]);
+        $user = $userrep->findOneBy(["email"=> $data["username"]]);
 
         if($user){
             $password = $data['password'];
             if($passwordHasher->isPasswordValid($user,$password)){
-                return $this -> json("Login Successful", 
+                $token = $jwtManager->create($user, $password);
+                return $this -> json([
+                    'message' => "Login Successful", 
+                    'token' => $token
+                ], 
                 Response::HTTP_OK);
             }else{
                 return $this -> json("Invalid Password", 

@@ -12,13 +12,13 @@ nelmio_api_doc:
                     properties:
                         name: {type: string, example: 'Example Name'}
                         surname: {type: string, example: 'Example Surname'}
-                        email: {type: string, example: 'example123@gmail.com'}
+                        username: {type: string, example: 'example123@gmail.com'}
                         password: {type: string, example: 'Password123'}
 
                 userLogin:
                     type: object
                     properties:
-                        email: {type: string, example: 'example123@gmail.com'}
+                        username: {type: string, example: 'example123@gmail.com'}
                         password: {type: string, example: 'Password123'}
 
                 newSensor:
