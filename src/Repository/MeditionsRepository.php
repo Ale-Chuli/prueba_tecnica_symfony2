@@ -21,35 +21,14 @@ class MeditionsRepository extends ServiceEntityRepository
         parent::__construct($registry, Meditions::class);
     }
 
-//    /**
-//     * @return Meditions[] Returns an array of Meditions objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-public function findAllWithWineName(): array
-{
-    return $this->createQueryBuilder('m')
-        ->select('m, v.name as wine_Name')
-        ->innerJoin('App\Entity\Wines', 'v', 'WITH', 'm.wine = v.id')
-        ->getQuery()
-        ->getResult();
-}
-//    public function findOneBySomeField($value): ?Meditions
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //Returns all meditions with the respect wine name
+    public function findAllWithWineName(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->select('m, v.name as wine_Name')
+            ->innerJoin('App\Entity\Wines', 'v', 'WITH', 'm.wine = v.id')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

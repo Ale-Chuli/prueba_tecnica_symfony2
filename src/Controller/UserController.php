@@ -20,6 +20,7 @@ use OpenApi\Attributes as OA;
 
 class UserController extends AbstractController
 {
+    // Route definition for user registration
     #[Route('/register', name: 'register', methods: ['POST'])]
     #[OA\RequestBody(required: true, content: new OA\JsonContent(ref:'#/components/schemas/userRegister'))]
     #[OA\Response(
@@ -29,34 +30,39 @@ class UserController extends AbstractController
     public function userRegister(EntityManagerInterface $em, Request $request,
     UserPasswordHasherInterface $passwordHasher, UsersRepository $userrep): Response
    {
-       $body = $request-> getContent();
-       $data = json_decode($body, true);
+        // Get the request body content
+        $body = $request-> getContent();
+        // Decode the JSON content into a PHP array
+        $data = json_decode($body, true);
 
+        //Checks if the user already exists with the provided email
         if($userrep->findOneBy(["email"=> $data["username"]])){
             return $this->json("This email is already in use, try again", 
             Response::HTTP_CONFLICT);
         }
+        //Create a new User and sets the request data
+        $user = new Users();
+        $user->setEmail($data['username']);
+        $user->setName($data['name']);
+        $user->setSurname($data['surname']);
+        $password = $data['password'];
 
-       $user = new Users();
-       $user->setEmail($data['username']);
-       $user->setName($data['name']);
-       $user->setSurname($data['surname']);
-       $password = $data['password'];
-
-       //https://symfony.com/doc/current/security/passwords.html
-       $hashedPassword = $passwordHasher->hashPassword(
+       //Hash the user password
+        $hashedPassword = $passwordHasher->hashPassword(
            $user,
            $password
-       );
-       $user->setPassword($hashedPassword);
+        );
+        $user->setPassword($hashedPassword);
        
-       $em-> persist($user);
-       $em->flush();
+        //Persist the user into the database and save the changes on it
+        $em-> persist($user);
+        $em->flush();
 
-       return $this->json("User has been created", 
-       Response::HTTP_CREATED);
+        return $this->json("User has been created", 
+        Response::HTTP_CREATED);
    }
 
+   // Route definition for user login
    #[Route("/login", name:"user_login", methods: ['POST'])]
    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref:'#/components/schemas/userLogin'))]
    #[OA\Response(
@@ -66,11 +72,15 @@ class UserController extends AbstractController
    public function userLogin(UsersRepository $userrep, Request $request,
     UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $jwtManager):Response
     {
+        // Get the request body content
         $body = $request-> getContent();
+        // Decode the JSON content into a PHP array
         $data = json_decode($body, true);
 
+        //Find the user by the provided email
         $user = $userrep->findOneBy(["email"=> $data["username"]]);
 
+        //If user exists, checks if the provided password is valid and it will generate a JWT for the user
         if($user){
             $password = $data['password'];
             if($passwordHasher->isPasswordValid($user,$password)){
